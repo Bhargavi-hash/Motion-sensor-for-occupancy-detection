@@ -25,8 +25,8 @@ Melopero_AMG8833 grid_sensor;
 #define camPin2 14
 #define pirPin 19
 #define motionLed 18
-# SCL_pin is GPIO22 in esp32
-# SDA_pin is GPIO21 in esp32
+// SCL_pin is GPIO22 in esp32
+// SDA_pin is GPIO21 in esp32
 
 bool isDetected;
 float t;
