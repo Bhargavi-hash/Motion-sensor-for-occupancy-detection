@@ -3,8 +3,11 @@
 #include <WiFiClient.h>
 #include "HTTPClient.h"
 #include "time.h"
+
 #include <Melopero_AMG8833.h>
 Melopero_AMG8833 grid_sensor;
+
+//*******CAM code
 #include "esp_camera.h"
 // WARNING!!! PSRAM IC required for UXGA resolution and high JPEG quality
 //            Ensure ESP32 Wrover Module or other board with PSRAM is selected
@@ -23,20 +26,23 @@ Melopero_AMG8833 grid_sensor;
 #include "camera_pins.h"
 #define camPin1 13
 #define camPin2 14
-#define pirPin 19
+//*******CAM code
+
+#define pirPin 19 // pirOutput pin
 #define motionLed 18
 // SCL_pin is GPIO22 in esp32
 // SDA_pin is GPIO21 in esp32
 
-bool isDetected;
-float t;
+bool isDetected;//pirout
+//float t;
 String  motion;
 
-//String distance = "200";
+
 /*Put your SSID & Password*/
 const char *ssid = "redmi"; // Enter SSID here
 const char *pwd = "09262525";  //Enter Password here
 
+WebServer server(80);
 void startCameraServer();
 
 String cse_ip = "192.168.1.7"; // Do ifconfig to get your ip.
@@ -62,8 +68,8 @@ void CreateCImotion(String &val)
   http.end();
 }
 
-WebServer server(80);
-void send_event(const char *event);
+
+
 void setup()
 {
   //Serial.begin(9600);
@@ -73,6 +79,8 @@ void setup()
   delay(100);
   pinMode(pirPin, INPUT);
   pinMode(motionLed, OUTPUT);
+  digitalWrite(motionLed, LOW);
+  
  //********** GRID EYE CODE
   // initializing I2C to use default address AMG8833_I2C_ADDRESS_B and Wire (I2C-0):
   Wire.begin();
@@ -88,7 +96,9 @@ void setup()
   statusCode = grid_sensor.setFPSMode(FPS_MODE::FPS_10);
   Serial.println(grid_sensor.getErrorDescription(statusCode));
 //******** GRID EYE CODE
-  digitalWrite(motionLed, LOW);
+  
+
+  
   //**********CAM code
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
@@ -154,7 +164,6 @@ void setup()
   Serial.println(ssid);
   //connect to your local wi-fi network
   WiFi.begin(ssid, pwd);
-
   //check wi-fi is connected to wi-fi network
   while (WiFi.status() != WL_CONNECTED)
   {
@@ -165,12 +174,14 @@ void setup()
   Serial.println("WiFi connected..!");
   Serial.print("Got IP: ");
   Serial.println(WiFi.localIP());
+  
 //*******CAM code
   startCameraServer();
   Serial.print("Camera Ready! Use 'http://");
   Serial.print(WiFi.localIP());
   Serial.println("' to connect");
-//*******CAM code  
+//*******CAM code
+  
   server.begin();
   Serial.println("HTTP server started");
 }
@@ -179,29 +190,38 @@ void loop()
 {
   server.handleClient();
   
-  digitalWrite(motionLed, LOW);
   
-  int m = 0;
-  for (int i = 0; i < 10; i++)
-  {
-    isDetected = digitalRead(pirPin);
-    String motion_val = (String)isDetected;
-    CreateCImotion(motion_val);
-    motion = String(isDetected);
-    if (isDetected)
-    {
-      m = 1;
-      Serial.println("Motion detected");
-      digitalWrite(motionLed, HIGH);
-      
-      delay(1000);
-    }
-  }
   
-  if (m == 0)
-  {
-    Serial.println("No Motion Detected");
-  }
+//  int m = 0;
+//  for (int i = 0; i < 10; i++)
+//  {
+//    isDetected = digitalRead(pirPin);
+//    String motion_val = (String)isDetected;
+//    CreateCImotion(motion_val);
+//    motion = String(isDetected);
+//    if (isDetected)
+//    {
+//      m = 1;
+//      digitalWrite(motionLed, HIGH);
+//      Serial.println("Motion detected");
+//      delay(1000);
+//    }
+//  }
+//  
+//  if (m == 0)
+//  { digitalWrite(motionLed, LOW);
+//    Serial.println("No Motion Detected");
+//  }
+  isDetected = digitalRead(pirPin);
+  if(pirout){
+    digitalWrite(motionLed, HIGH);
+    Serial.println("motion detected!");
+   }else {
+    digitalWrite(motionLed, LOW);
+    Serial.println("motion not detected!");
+   }
+    Serial.println();
+  
   //***************GRID EYE CODE
   Serial.print("Updating grid_eye thermistor temperature ... ");
   int statusCode = grid_sensor.updateThermistorTemperature();
