@@ -30,12 +30,17 @@ Melopero_AMG8833 grid_sensor;
 
 #define pirPin 19 // pirOutput pin
 #define motionLed 18
+
 // SCL_pin is GPIO22 in esp32
 // SDA_pin is GPIO21 in esp32
-
+#define timeSeconds 1 // interval at which to blink led(seconds)
 bool isDetected;//pirout
-//float t;
-String  motion;
+int ledState = LOW; // ledState used to set the LED
+// Timer: Auxiliar variables
+long now = millis();
+long lastTrigger = 0;
+boolean startTimer = false;
+//String  motion;
 
 
 /*Put your SSID & Password*/
@@ -45,30 +50,36 @@ const char *pwd = "09262525";  //Enter Password here
 WebServer server(80);
 void startCameraServer();
 
-String cse_ip = "192.168.1.7"; // Do ifconfig to get your ip.
-String cse_port = "8080";
-String Server = "http://" + cse_ip + ":" + cse_port + "/~/in-cse/in-name/";
+//String cse_ip = "192.168.1.7"; // Do ifconfig to get your ip.
+//String cse_port = "8080";
+//String Server = "http://" + cse_ip + ":" + cse_port + "/~/in-cse/in-name/";
 
-String ae1 = "eswPIR";
-String cnt1 = "node1";
-void CreateCImotion(String &val)
-{
-  HTTPClient http;
-  http.begin(Server + ae1 + "/" + cnt1 + "/");
-  http.addHeader("X-M2M-Origin", "admin:admin");
-  http.addHeader("Content-Type", "application/json;ty=4");
+//String ae1 = "eswPIR";
+//String cnt1 = "node1";
+//void CreateCImotion(String &val)
+//{
+//  HTTPClient http;
+//  http.begin(Server + ae1 + "/" + cnt1 + "/");
+//  http.addHeader("X-M2M-Origin", "admin:admin");
+//  http.addHeader("Content-Type", "application/json;ty=4");
+//
+//  int code = http.POST("{\"m2m:cin\": {\"cnf\":\"application/json\",\"con\": " + String(val) + "}}");
+//
+//  Serial.println(code);
+//  if (code == -1)
+//  {
+//    Serial.println("UNABLE TO CONNECT TO THE SERVER");
+//  }
+//  http.end();
+//}
 
-  int code = http.POST("{\"m2m:cin\": {\"cnf\":\"application/json\",\"con\": " + String(val) + "}}");
-
-  Serial.println(code);
-  if (code == -1)
-  {
-    Serial.println("UNABLE TO CONNECT TO THE SERVER");
-  }
-  http.end();
+void IRAM_ATTR detectsMovement() {
+  Serial.println("MOTION DETECTED!!!");
+  digitalWrite(motionLed, HIGH);
+  ledState = HIGH;
+  startTimer = true;
+  lastTrigger = millis();
 }
-
-
 
 void setup()
 {
@@ -77,9 +88,11 @@ void setup()
   Serial.setDebugOutput(true);
   Serial.println();
   delay(100);
-  pinMode(pirPin, INPUT);
+  //pinMode(pirPin, INPUT);
+  pinMode(pirPin, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(pirPin), detectsMovement, RISING);
   pinMode(motionLed, OUTPUT);
-  digitalWrite(motionLed, LOW);
+  digitalWrite(motionLed, ledState);
   
  //********** GRID EYE CODE
   // initializing I2C to use default address AMG8833_I2C_ADDRESS_B and Wire (I2C-0):
@@ -189,9 +202,32 @@ void setup()
 void loop()
 {
   server.handleClient();
+  now = millis();
+  if(startTimer && (now - lastTrigger > (timeSeconds*1000))) {
+    Serial.println("Motion stopped...");
+    digitalWrite(motionLed, LOW);
+    ledState=LOW;
+    startTimer = false;
+  }
+//  if(currentMillis - previousMillis >=timeSeconds*1000){
+//    if(ledState == HIGH){
+//      ledState == LOW;
+//      digitalWrite(motionLed, ledState);
+//    }
+//  }
+//  isDetected = digitalRead(pirPin);
+//  if(pirout){
+//    digitalWrite(motionLed, HIGH);
+//    previousMillis = currentMillis;
+//    ledState = HIGH;
+//    Serial.println("motion detected!");
+//   }else {
+//    Serial.println("motion not detected!");
+//   }
+   
   
-  
-  
+  // set the LED with the ledState of the variable:
+   
 //  int m = 0;
 //  for (int i = 0; i < 10; i++)
 //  {
@@ -212,15 +248,7 @@ void loop()
 //  { digitalWrite(motionLed, LOW);
 //    Serial.println("No Motion Detected");
 //  }
-  isDetected = digitalRead(pirPin);
-  if(pirout){
-    digitalWrite(motionLed, HIGH);
-    Serial.println("motion detected!");
-   }else {
-    digitalWrite(motionLed, LOW);
-    Serial.println("motion not detected!");
-   }
-    Serial.println();
+  
   
   //***************GRID EYE CODE
   Serial.print("Updating grid_eye thermistor temperature ... ");
