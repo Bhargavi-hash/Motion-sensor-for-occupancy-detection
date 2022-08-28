@@ -23,7 +23,8 @@ from functions import *
 from PIL import Image
 import random
 
-connection_url='mongodb+srv://bhargavi:esw2022@cluster0.epj3orz.mongodb.net/?retryWrites=true&w=majority'
+connection_url='mongodb+srv://bhargavi:esw2022@eswpro.pkqjhmv.mongodb.net/?retryWrites=true&w=majority'
+DB_NAME = 'userDetails'
 
 ans = []
 
@@ -62,7 +63,6 @@ def getblobs(arr):
         ta = []
         for j in range(8):
             if arr[i][j] > 0:
-
                 arr[i][j] = 255
                 actcnt += 1
             else:
@@ -194,7 +194,7 @@ def dashboard():
 def login(username, password):
     value = 0
     client = MongoClient(connection_url)
-    db = client['Login_bd.user_details']
+    db = client[DB_NAME]
     users = db["users"]
     list = users.find()
     for ele in list:
@@ -204,7 +204,7 @@ def login(username, password):
 
 def sign_up(new_user, new_password):
     client = MongoClient(connection_url)
-    db = client['Login_bd.user_details']
+    db = client[DB_NAME]
     users = db["users"]
     list = users.find()
     for ele in list:
@@ -214,10 +214,10 @@ def sign_up(new_user, new_password):
         "username": new_user,
         "password": new_password
     }
-    # users.insert_one(new)
-    # labels = ["label1", "label2"]
+    users.insert_one(new)
+    labels = ["username", "password"]
     # create_ae(
-    #     "https://esw-onem2m.iiit.ac.in:443/~/in-cse/in-name/Team-24/", new_user, labels)
+    #     "http://127.0.0.1:8080/~/in-cse/in-name", 'eswPIR', labels)
     return 1
 
 
@@ -245,8 +245,8 @@ def main():
             username = st.sidebar.text_input("Username")
             password = st.sidebar.text_input("Password", type='password')
             if st.sidebar.button("Login"):
-                #loginvalue = login(username, password)
-                #if loginvalue == 1:
+                loginvalue = login(username, password)
+                if loginvalue == 1:
                     st.session_state.username = username
                     st.header("Fields to be displayed here")
                     st.markdown(
@@ -258,9 +258,8 @@ def main():
                  - etc..
                 """
                     )
-                    # dashboard()
                     st.experimental_rerun()
-                # elif loginvalue == 0:
+                elif loginvalue == 0:
                     st.warning("Invalid credentials")
 
         elif choice == "Signup":
@@ -273,17 +272,17 @@ def main():
                 if(new_password != confirm_password):
                     st.warning("Password and confirm password doesn't match")
                 else:
-                # final = sign_up(new_user, new_password)
-                # if final == 1:
-                    with st.spinner(text='In progress'):
-                        time.sleep(4)
-                        st.success("Account created successfully")
-                        st.balloons()
-                        st.title('Welcome ' + new_user)
-                        st.info("Go to Login Menu to Login")
+                    final = sign_up(new_user, new_password)
+                    if final == 1:
+                        with st.spinner(text='In progress'):
+                            time.sleep(3)
+                            st.success("Account created successfully")
+                            st.balloons()
+                            st.title('Welcome ' + new_user)
+                            st.info("Go to Login Menu to Login")
 
-                # elif final == 0:
-                    # st.warning("User already exists")
+                    elif final == 0:
+                        st.warning("User already exists")
     else:
         logout = st.button("Logout")
         if logout:
