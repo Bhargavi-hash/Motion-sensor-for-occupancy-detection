@@ -7,7 +7,7 @@
 #include <Melopero_AMG8833.h>
 Melopero_AMG8833 grid_sensor;
 
-//*******CAM code
+//*******CAM codef
 #include "esp_camera.h"
 #define CAMERA_MODEL_AI_THINKER // Has PSRAM
 //#define CAMERA_MODEL_TTGO_T_JOURNAL // No PSRAM
@@ -21,32 +21,26 @@ Melopero_AMG8833 grid_sensor;
 
 // SCL_pin is GPIO22 in esp32
 // SDA_pin is GPIO21 in esp32
-#define timeSeconds 5 // interval at which to blink led(seconds)
+#define timeSeconds 1 // interval at which to blink led(seconds)
+
 
 int ledState = LOW; // ledState used to set the LED
+int pirState = LOW;
 // Timer: Auxiliar variables
 long now = millis();
 long lastTrigger = 0;
 boolean startTimer = false;
-
+int val = LOW;
 
 
 /*Put your SSID & Password*/
-const char *ssid = "redmi"; // Enter SSID here
-const char *pwd = "09262525";  //Enter Password here
+const char *ssid = "Galaxy M112694"; // Enter SSID here
+const char *pwd = "12345678";  //Enter Password here
 
-WebServer server(80);
+//WebServer server(80);
 void startCameraServer();
 
 
-
-void IRAM_ATTR detectsMovement() {
-  Serial.println("MOTION DETECTED!!!");
-  digitalWrite(motionLed, HIGH);
-  ledState = HIGH;
-  startTimer = true;
-  lastTrigger = millis();
-}
 
 void setup()
 {
@@ -55,8 +49,7 @@ void setup()
   Serial.setDebugOutput(true);
   Serial.println();
   delay(100);
-  pinMode(pirPin, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(pirPin), detectsMovement, RISING);
+  pinMode(pirPin, INPUT);
   pinMode(motionLed, OUTPUT);
   digitalWrite(motionLed, ledState);
   
@@ -161,20 +154,46 @@ void setup()
   Serial.println("' to connect");
 //*******CAM code
   
-  server.begin();
+ // server.begin();
   Serial.println("HTTP server started");
 }
 
 void loop()
 {
-  server.handleClient();
-  now = millis();
-  if(startTimer && (now - lastTrigger > (timeSeconds*1000))) {
-    Serial.println("Motion stopped...");
-    digitalWrite(motionLed, LOW);
-    ledState=LOW;
-    startTimer = false;
+  //server.handleClient();
+  
+  
+  val = digitalRead(pirPin);  // read pir value
+  if (val == HIGH){
+    digitalWrite(motionLed, HIGH);
+    ledState = HIGH;
+    startTimer = true;
+    lastTrigger = millis();
+    if(pirState == LOW){
+      Serial.println("MOTION DETECTED!!!");
+      pirState = HIGH;
+    }
   }
+  else{
+    pirState=LOW;
+    now = millis();
+    if(startTimer==true) {
+      if((now - lastTrigger) > (timeSeconds*1000)){
+        Serial.println("Motion stopped...");
+        digitalWrite(motionLed, LOW);
+        ledState = LOW;
+        startTimer = false;
+      }
+      else {
+        digitalWrite(motionLed, HIGH);
+        ledState = HIGH;
+      }
+    }
+  }
+// if duration after "motion stopped"  and next line is >=10 sec . then it is considered as motion stopped really, otherwise motion is not really stopped.
+  
+  
+  
   //***************GRID EYE CODE
   Serial.print("Updating grid_eye thermistor temperature ... ");
   int statusCode = grid_sensor.updateThermistorTemperature();
