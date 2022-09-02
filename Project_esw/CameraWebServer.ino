@@ -84,6 +84,7 @@ void handleJpgMid()
     Serial.println("SET-MID-RES FAIL");
   }
   serveJpg();
+  // capturing
 }
 
 void setup()
