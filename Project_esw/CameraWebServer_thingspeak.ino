@@ -232,15 +232,21 @@ void loop()
   
   
   //we are sending data to thingspeak every 15 seconds
+  //we are sending data to thingspeak every 15 seconds
   if(count == 15)
   {
        int x = ThingSpeak.writeField(myChannelNumber, 1, pirState, WriteAPI);
-       int y = ThingSpeak.writeField(myChannelNumber, 2, gridEyeTemperature, WriteAPI);
+       
       if(x == 200)Serial.println("Channel update successful.");
       else Serial.println("Problem updating channel. HTTP error code " + String(x));
+         
+  }
+  else if(count ==30){
+      int y = ThingSpeak.writeField(myChannelNumber, 2, gridEyeTemperature, WriteAPI);
+      
       if(y == 200)Serial.println("Channel update successful.");
       else Serial.println("Problem updating channel. HTTP error code " + String(y));
-      count = 0;      
+      count = 0;   
   }
    delay(1000);
    count++;
