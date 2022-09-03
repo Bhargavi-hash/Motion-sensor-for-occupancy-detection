@@ -178,23 +178,38 @@ void loop()
       pirState = HIGH;
     }
   }
-  else{
-    pirState=LOW;
-    
-    now = millis();
-    if(startTimer==true) {
-      if((now - lastTrigger) > (timeSeconds*1000)){
-        
+  else if(val ==LOW){
+      if(pirState == HIGH){
         Serial.println("Motion stopped...");
-        digitalWrite(motionLed, LOW);
-        ledState = LOW;
-        startTimer = false;
+        pirState = LOW;
       }
-      else {
-        digitalWrite(motionLed, HIGH);
-        ledState = HIGH;
-      }
-    }
+  }
+//  else{
+//    pirState=LOW;
+//    now = millis();
+//    if(startTimer==true) {
+//      if((now - lastTrigger) > (timeSeconds*1000)){
+//        Serial.println("Motion stopped...");
+//        digitalWrite(motionLed, LOW);
+//        ledState = LOW;
+//        startTimer = false;
+//      }
+//      else {
+//        digitalWrite(motionLed, HIGH);
+//        ledState = HIGH;
+//      }
+//    }
+//  }
+  now = millis();
+  if(startTimer && ((now - lastTrigger) > (timeSeconds*1000))) {
+   // Serial.println("Motion stopped...");
+   
+    digitalWrite(motionLed, LOW);
+    ledState=LOW;
+    //Serial.println(ledState);
+    
+    //pirState=LOW;
+    startTimer = false;
   }
 // if duration after "motion stopped"  and next line is >=10 sec . then it is considered as motion stopped really, otherwise motion is not really stopped.
   
