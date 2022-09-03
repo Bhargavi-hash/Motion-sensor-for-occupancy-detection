@@ -24,6 +24,9 @@ Melopero_AMG8833 grid_sensor;
 const char* host = "api.thingspeak.com";
 const char* WriteAPI = "T27SXD639SVCB0MX";
 
+WiFiClient  client;
+
+unsigned long myChannelNumber = 2;
 
 // SCL_pin is GPIO22 in esp32
 // SDA_pin is GPIO21 in esp32
@@ -37,7 +40,7 @@ long now = millis();
 long lastTrigger = 0;
 boolean startTimer = false;
 int val = LOW;
-
+int count=0;
 
 /*Put your SSID & Password*/
 const char *ssid = "Galaxy M511CCF"; // Enter SSID here
@@ -155,6 +158,7 @@ void setup()
  
   server.begin();
   Serial.println("HTTP server started");
+  ThingSpeak.begin(client); 
 }
 
 void loop()
@@ -164,6 +168,7 @@ void loop()
   
   val = digitalRead(pirPin);  // read pir value
   if (val == HIGH){
+    
     digitalWrite(motionLed, HIGH);
     ledState = HIGH;
     startTimer = true;
@@ -175,9 +180,11 @@ void loop()
   }
   else{
     pirState=LOW;
+    
     now = millis();
     if(startTimer==true) {
       if((now - lastTrigger) > (timeSeconds*1000)){
+        
         Serial.println("Motion stopped...");
         digitalWrite(motionLed, LOW);
         ledState = LOW;
@@ -216,45 +223,26 @@ void loop()
     Serial.println();
   }
 
-  delay(1000);
+  
   //***************GRID EYE CODE
 
   //***************Thingspeak
 
-  WiFiClient client;
-  const int httpPort = 80;
   
-  if (!client.connect(host, httpPort)) {
-      Serial.println("connection failed");
-      return;
-  }
-  else
+  
+  
+  //we are sending data to thingspeak every 15 seconds
+  if(count == 15)
   {
-    Serial.println("Connection Success");
+       int x = ThingSpeak.writeField(myChannelNumber, 1, pirState, WriteAPI);
+       int y = ThingSpeak.writeField(myChannelNumber, 2, gridEyeTemperature, WriteAPI);
+      if(x == 200)Serial.println("Channel update successful.");
+      else Serial.println("Problem updating channel. HTTP error code " + String(x));
+      if(y == 200)Serial.println("Channel update successful.");
+      else Serial.println("Problem updating channel. HTTP error code " + String(y));
+      count = 0;      
   }
-// We now create a URI for the request
-  String url = "/update";
-  url += "?api_key=";
-  url += WriteAPI;
-  url += "&field1=";
-  url += val;
-
-//  String url = "/update";
-//  url += "?api_key=";
-//  url += WriteAPI;
-//  url += "&field2=";
-//  url += val;
-
-  String url1 = "/update";
-  url1 += "?api_key=";
-  url1 += WriteAPI;
-  url1 += "&field2=";
-  url1 += gridEyeTemperature;
-
-  while(client.available()) {
-      String line = client.readStringUntil('\r');
-      Serial.print(line);
-  }
- 
+   delay(1000);
+   count++;
 }
  
