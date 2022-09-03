@@ -2,8 +2,8 @@ from logging import log
 #import tkinter as tk
 from requests import status_codes
 import streamlit as st
-# from streamlit_autorefresh import st_autorefresh
 from onem2m import *
+# from streamlit_autorefresh import st_autorefresh
 import pymongo
 from pymongo import MongoClient
 import webbrowser
@@ -22,6 +22,63 @@ import time
 from functions import *
 from PIL import Image
 import random
+#from skimage import io
+import urllib.request as urllib2
+import json
+import time
+from PIL import Image
+import streamlit.components.v1 as components
+# imagePIR = Image.open("https://thingspeak.com/channels/1837486/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15")
+
+
+READ_API_KEY='G32R85RJUZL7CWY4'   
+CHANNEL_ID= '1848200'
+
+# def pir():
+#     return '<iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/1837486/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+# '
+def ThingspeakPIR():
+    TS = urllib2.urlopen("http://api.thingspeak.com/channels/%s/feeds/last.json?api_key=%s" \
+                       % (CHANNEL_ID,READ_API_KEY))
+
+    response = TS.read()
+    data = json.loads(response)
+    a = data['created_at']
+    b = data['field1']
+    
+    # d = data['field2']
+    st.subheader("PIR value = {}".b)
+    time.sleep(5)   
+
+    TS.close()
+
+def ThingspeakTEMP():
+    
+    # TS1 = urllib2.urlopen("http://api.thingspeak.com/channels/%s/feeds/last.json?api_key=%s" \
+    #                    % (CHANNEL_ID,READ_API_KEY))
+
+    # response = TS1.read()
+    # print(response)
+    # data=json.loads(response)
+    st.json({
+
+    'created_at':'2022-09-03 10:59:02.434',
+
+    'Temperature': '00.00',
+
+    'timestamp' : '2022-09-03 10:59:02.434'
+
+    })
+
+
+    # a = data['created_at']
+    # b = data['field1']
+    
+    # d = data['field3']
+    # print (data['field1'] + "   " + data['field3'])
+    # time.sleep(5)   
+
+    # TS.close()
 
 connection_url='mongodb+srv://bhargavi:esw2022@eswpro.pkqjhmv.mongodb.net/?retryWrites=true&w=majority'
 DB_NAME = 'userDetails'
@@ -38,6 +95,19 @@ nfa = []
 
 vis = []
 cnt = 1
+
+
+
+# def heatmap_display():
+#     sns.set_theme()
+
+#     # Load the example flights dataset and convert to long-form
+#     flights_long = sns.load_dataset("data")
+#     flights = flights_long.pivot("month", "year", "passengers")
+
+#     # Draw a heatmap with the numeric values in each cell
+#     f, ax = plt.subplots(figsize=(9, 6))
+#     sns.heatmap(flights, annot=True, fmt="d", linewidths=.5, ax=ax)
 
 def dfs(i, j, arr):
     global vis
@@ -153,11 +223,15 @@ def dashboard():
         # st.header("Number of people in the room : " + str(people))
         # hm = sns.heatmap(data=convert_to_table(grideye))
         # st.pyplot()
+        # components.iframe("https://thingspeak.com/channels/1848200/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&xaxis=Timestamp")
         st.markdown(
             """
             Here goes the heat map - Grid eye sensor
+            - Uses 8*8 grid
             """
         )
+        # ThingspeakTEMP()
+        #heatmap_display()
     elif st.session_state.task == "Temperature":
         st.header("Temperature")
         # grideye, time_stamp, pir = temp()
@@ -167,27 +241,30 @@ def dashboard():
         st.markdown(
             """
             Temperature recorded using Grid eye
-            - 8 * 8 matrix
             """
         )
+        components.iframe("https://thingspeak.com/channels/1848200/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&xaxis=Timestamp")
+        
     elif st.session_state.task == "Data":
-        on = Image.open("./on.jpg")
-        off = Image.open("./off.jpg")
+        # on = Image.open("./on.jpg")
+        # off = Image.open("./off.jpg")
         # grideye, time_stamp, pir = temp()
         # st.subheader(convert_time(time_stamp))
         st.subheader("Time stamp here")
         #people = algo(getfeature(convert_to_table(grideye)))
         st.subheader("Some statistics")
         st.header("PIR Data")
-        people = 0
-        if people == 0:
-            st.image(off)
-        else:
-            ran = random.randint(1, 10)
-            if ran <= 8:
-                st.image(on)
-            else:
-                st.image(off)
+        components.iframe("https://thingspeak.com/channels/1848200/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&xaxis=Timestamp")
+        # ThingspeakPIR()
+        # people = 0
+        # if people == 0:
+        #     st.image(off)
+        # else:
+        #     ran = random.randint(1, 10)
+        #     if ran <= 8:
+        #         st.image(on)
+        #     else:
+        #         st.image(off)
 
 
 
@@ -245,8 +322,8 @@ def main():
             username = st.sidebar.text_input("Username")
             password = st.sidebar.text_input("Password", type='password')
             if st.sidebar.button("Login"):
-                loginvalue = login(username, password)
-                if loginvalue == 1:
+                # loginvalue = login(username, password)
+                # if loginvalue == 1:
                     st.session_state.username = username
                     st.header("Fields to be displayed here")
                     st.markdown(
@@ -259,8 +336,8 @@ def main():
                 """
                     )
                     st.experimental_rerun()
-                elif loginvalue == 0:
-                    st.warning("Invalid credentials")
+                # elif loginvalue == 0:
+                #     st.warning("Invalid credentials")
 
         elif choice == "Signup":
             st.sidebar.subheader("Register here")
@@ -272,8 +349,8 @@ def main():
                 if(new_password != confirm_password):
                     st.warning("Password and confirm password doesn't match")
                 else:
-                    final = sign_up(new_user, new_password)
-                    if final == 1:
+                    # final = sign_up(new_user, new_password)
+                    # if final == 1:
                         with st.spinner(text='In progress'):
                             time.sleep(3)
                             st.success("Account created successfully")
@@ -281,8 +358,8 @@ def main():
                             st.title('Welcome ' + new_user)
                             st.info("Go to Login Menu to Login")
 
-                    elif final == 0:
-                        st.warning("User already exists")
+                    # elif final == 0:
+                    #     st.warning("User already exists")
     else:
         logout = st.button("Logout")
         if logout:
