@@ -208,6 +208,8 @@ void om2m_createCI(int & pirState, String & row01,String & row23,String & row45,
   }
   http.end();
 }
+
+
 void loop(){
    server.handleClient();
   
@@ -277,47 +279,45 @@ void loop(){
   String row67 = String(arr[6]+","+arr[7]);
 
   //***************GRID EYE CODE
-  //************** OM2M *****************
- om2m_createCI(pirState,row01,row23,row45,row67);
+ 
+ //we are sending data to thingspeak & OM2M every 30 seconds 
+ if(count == 30){ 
+     //************** OM2M *****************
+     om2m_createCI(pirState,row01,row23,row45,row67);
 
-//************** OM2M *****************
-   //***************Thingspeak
+    //************** OM2M *****************
+     ThingSpeak.setField(1, pirState);
+     ThingSpeak.setField(2, gridEyeTemperature);
+     ThingSpeak.setField(3, row01);
+     ThingSpeak.setField(4, row23);
+     ThingSpeak.setField(5, row45);
+     ThingSpeak.setField(6, row67);
 
- //we are sending data to thingspeak every 15 seconds 
-if(count == 15){ 
-     
-    ThingSpeak.setField(1, pirState);
-    ThingSpeak.setField(2, gridEyeTemperature);
-    ThingSpeak.setField(3, row01);
-    ThingSpeak.setField(4, row23);
-    ThingSpeak.setField(5, row45);
-    ThingSpeak.setField(6, row67);
-  
-//    Serial.println();
-//    Serial.println("Pixel matrix rows converted to strings by values being separated by commas");
-//    Serial.println();
-//    Serial.print("row 0 & 1: ");
-//    Serial.println(row01);
-//    Serial.print("row 2 & 3: ");
-//    Serial.println(row23);
-//    Serial.print("row 4 & 5: ");
-//    Serial.println(row45);
-//    Serial.print("row 6 & 7: ");
-//    Serial.println(row67);
-//    Serial.println();
-    // Write to ThingSpeak. There are up to 8 fields in a channel, allowing you to store up to 8 different
-    // pieces of information in a channel. 
-    
-    int x = ThingSpeak.writeFields(myChannelNumber, WriteAPI);
+ //    Serial.println();
+ //    Serial.println("Pixel matrix rows converted to strings by values being separated by commas");
+ //    Serial.println();
+ //    Serial.print("row 0 & 1: ");
+ //    Serial.println(row01);
+ //    Serial.print("row 2 & 3: ");
+ //    Serial.println(row23);
+ //    Serial.print("row 4 & 5: ");
+ //    Serial.println(row45);
+ //    Serial.print("row 6 & 7: ");
+ //    Serial.println(row67);
+ //    Serial.println();
+     // Write to ThingSpeak. There are up to 8 fields in a channel, allowing you to store up to 8 different
+     // pieces of information in a channel. 
 
-    if(x == 200){
-      Serial.println("Channel update successful.");
-    }
-    else{
-      Serial.println("Problem updating channel. HTTP error code " + String(x));
-    }
-    count = 0;
-}
+     int x = ThingSpeak.writeFields(myChannelNumber, WriteAPI);
+
+     if(x == 200){
+       Serial.println("Channel update successful.");
+     }
+     else{
+       Serial.println("Problem updating channel. HTTP error code " + String(x));
+     }
+     count = 0;
+ }
    delay(1000);
    count++;
 }
