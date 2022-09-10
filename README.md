@@ -15,3 +15,6 @@ Embedded systems workshop team project for Motion sensor for occupancy detection
 
 - DB_NAME: userDetails
  
+## Connection to iiith network for esp32
+-const char *ssid = "esw-m19@iiith"; // Enter SSID here
+-const char *pwd = "e5W-eMai@3!20hOct";  //Enter Password here
