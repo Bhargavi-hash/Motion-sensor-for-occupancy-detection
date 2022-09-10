@@ -43,10 +43,10 @@ int val = LOW;
 int count=0;
 
 /*Put your SSID & Password*/
-const char *ssid = "Galaxy M112694"; // Enter SSID here
-const char *pwd = "12345678";  //Enter Password here
-//const char *ssid = "Galaxy M511CCF"; // Enter SSID here
-//const char *pwd = "ramreddy@3";  //Enter Password here
+//const char *ssid = "Galaxy M112694"; // Enter SSID here
+//const char *pwd = "12345678";  //Enter Password here
+const char *ssid = "Galaxy M511CCF"; // Enter SSID here
+const char *pwd = "ramreddy@3";  //Enter Password here
 
 WebServer server(80);
 //void startCameraServer();
@@ -55,7 +55,7 @@ WebServer server(80);
 //static auto midRes = esp32cam::Resolution::find(350, 530);
 //static auto hiRes = esp32cam::Resolution::find(800, 600);
 //************** OM2M *****************
-#define CSE_IP      "192.168.36.221" //replace with system-ip  //127.0.0.1 //esw-onem2m.iiit.ac.in
+#define CSE_IP      "192.168.171.221"//192.168.36.221 //replace with system-ip  //127.0.0.1 //esw-onem2m.iiit.ac.in
 #define CSE_PORT    5089 //443
 #define HTTPS     false
 #define OM2M_ORGIN    "admin:admin"
@@ -188,6 +188,9 @@ void om2m_createCI(int & pirState, String & row01,String & row23,String & row45,
   http.addHeader("Content-Type", "application/json;ty=4");
   http.addHeader("Content-Length", "500");
   
+  
+  
+  static int i=0;
   String label = "Node-1";
   
   String req_data = String() + "{\"m2m:cin\": {"
@@ -213,7 +216,6 @@ void om2m_createCI(int & pirState, String & row01,String & row23,String & row45,
 void loop(){
    server.handleClient();
   
-  static int i=0;
   val = digitalRead(pirPin);  // read pir value
   if (val == HIGH){
     
@@ -281,7 +283,7 @@ void loop(){
   //***************GRID EYE CODE
  
  //we are sending data to thingspeak & OM2M every 30 seconds 
- if(count == 30){ 
+// if(count == 30){ 
      //************** OM2M *****************
      om2m_createCI(pirState,row01,row23,row45,row67);
 
@@ -316,9 +318,10 @@ void loop(){
      else{
        Serial.println("Problem updating channel. HTTP error code " + String(x));
      }
-     count = 0;
- }
-   delay(1000);
-   count++;
+//     count = 0;
+// }
+//   delay(1000);
+//   count++;
+   delay(30000);
 }
  
