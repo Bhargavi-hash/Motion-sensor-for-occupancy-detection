@@ -56,14 +56,13 @@ WebServer server(80);
 //static auto midRes = esp32cam::Resolution::find(350, 530);
 //static auto hiRes = esp32cam::Resolution::find(800, 600);
 //************** OM2M *****************
-#define CSE_IP      "192.168.171.221"//"esw-onem2m.iiit.ac.in"////192.168.36.221 //replace with system-ip  //127.0.0.1 //esw-onem2m.iiit.ac.in
-#define CSE_PORT    5089 //443
+#define CSE_IP      "esw-onem2m.iiit.ac.in"//"192.168.171.221"//////192.168.36.221 //replace with system-ip  //127.0.0.1 //esw-onem2m.iiit.ac.in
+#define CSE_PORT    443 //5089 //443
 #define HTTPS     false
-#define OM2M_ORGIN   "admin:admin"//"zZ!#4s:m&Y$HL" //
+#define OM2M_ORGIN   "zZ!#4s:m&Y#HL" //"admin:admin"// //"zZ!#4s:m&Y#HL" 
 #define OM2M_MN     "/~/in-cse/in-name/"
-#define OM2M_AE     "Od-TEST"//"Team-28"// //"AE-TEST" //
+#define OM2M_AE     "Team-28"//"Od-TEST"//// //"AE-TEST" //"Team-28"
 #define OM2M_DATA_CONT  "Node-1/Data"
-
 
 //************** OM2M *****************
 
