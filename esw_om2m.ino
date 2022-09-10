@@ -41,6 +41,7 @@ long lastTrigger = 0;
 boolean startTimer = false;
 int val = LOW;
 int count=0;
+unsigned long epochTime; 
 
 /*Put your SSID & Password*/
 //const char *ssid = "Galaxy M112694"; // Enter SSID here
@@ -55,12 +56,12 @@ WebServer server(80);
 //static auto midRes = esp32cam::Resolution::find(350, 530);
 //static auto hiRes = esp32cam::Resolution::find(800, 600);
 //************** OM2M *****************
-#define CSE_IP      "192.168.171.221"//192.168.36.221 //replace with system-ip  //127.0.0.1 //esw-onem2m.iiit.ac.in
+#define CSE_IP      "192.168.171.221"//"esw-onem2m.iiit.ac.in"////192.168.36.221 //replace with system-ip  //127.0.0.1 //esw-onem2m.iiit.ac.in
 #define CSE_PORT    5089 //443
 #define HTTPS     false
-#define OM2M_ORGIN    "admin:admin"
+#define OM2M_ORGIN   "admin:admin"//"zZ!#4s:m&Y$HL" //
 #define OM2M_MN     "/~/in-cse/in-name/"
-#define OM2M_AE     "OD-TEST" //"AE-TEST" //Team-28
+#define OM2M_AE     "Od-TEST"//"Team-28"// //"AE-TEST" //
 #define OM2M_DATA_CONT  "Node-1/Data"
 
 
@@ -173,11 +174,23 @@ void setup()
   Serial.println("HTTP server started");
   ThingSpeak.begin(client); 
 }
+unsigned long getTime() {
+  time_t now;
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    //Serial.println("Failed to obtain time");
+    return(0);
+  }
+  time(&now);
+  return now;
+}
 
 void om2m_createCI(int & pirState, String & row01,String & row23,String & row45,String & row67){
-  
+
+  epochTime = getTime();
   HTTPClient http;
-  String data="[" + String(pirState) + ",[["+ row01 +"],[" +row23 +"],["+ row45 +"],["+ row67 +"]]]"; //String(occupancy) + " , " + String(distance)
+  
+  String data="[" + String(epochTime)+","+ String(pirState) + ",[["+ row01 +"],[" +row23 +"],["+ row45 +"],["+ row67 +"]]]"; //String(occupancy) + " , " + String(distance)
 
   String httpserver="http://" + String() + CSE_IP + ":" + String() + CSE_PORT + String()+OM2M_MN;
   
@@ -186,7 +199,7 @@ void om2m_createCI(int & pirState, String & row01,String & row23,String & row45,
   
   http.addHeader("X-M2M-Origin", OM2M_ORGIN);
   http.addHeader("Content-Type", "application/json;ty=4");
-  http.addHeader("Content-Length", "500");
+  http.addHeader("Content-Length", "600");
   
   
   
@@ -283,7 +296,7 @@ void loop(){
   //***************GRID EYE CODE
  
  //we are sending data to thingspeak & OM2M every 30 seconds 
-// if(count == 30){ 
+ if(count == 30){ 
      //************** OM2M *****************
      om2m_createCI(pirState,row01,row23,row45,row67);
 
@@ -318,10 +331,10 @@ void loop(){
      else{
        Serial.println("Problem updating channel. HTTP error code " + String(x));
      }
-//     count = 0;
-// }
-//   delay(1000);
-//   count++;
-   delay(30000);
+     count = 0;
+ }
+   delay(1000);
+   count++;
+   //delay(30000);
 }
  
