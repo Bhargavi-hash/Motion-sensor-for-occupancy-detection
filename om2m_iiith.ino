@@ -73,7 +73,7 @@ WebServer server(80);
 //static auto hiRes = esp32cam::Resolution::find(800, 600);
 //************** OM2M *****************
 #define CSE_IP     "esw-onem2m.iiit.ac.in" //"esw-onem2m.iiit.ac.in"//nand-"192.168.171.221"//"127.0.0.1"////ruch -"192.168.36.221" //replace with system-ip  // //esw-onem2m.iiit.ac.in
-#define CSE_PORT  443 //5089 //443
+//#define CSE_PORT  443 //5089 //443
 #define HTTPS     true
 #define OM2M_ORGIN   "zZ!#4s:m&Y#HL"//"zZ!#4s:m&Y#HL" //"admin:admin"
 #define OM2M_MN     "/~/in-cse/in-name/"
