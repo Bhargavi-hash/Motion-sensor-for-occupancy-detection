@@ -58,12 +58,12 @@ int count=0;
 //unsigned long epochTime; 
 
 /*Put your SSID & Password*/
-//const char *ssid = "Galaxy M112694"; // Enter SSID here
-//const char *pwd = "12345678";  //Enter Password here
+const char *ssid = "Galaxy M112694"; // Enter SSID here
+const char *pwd = "12345678";  //Enter Password here
 //const char *ssid = "Galaxy M511CCF"; // Enter SSID here
 //const char *pwd = "ramreddy@3";  //Enter Password here
-const char *ssid = "esw-m19@iiith"; // Enter iiith SSID here
-const char *pwd = "e5W-eMai@3!20hOct";  //Enter Password here
+//const char *ssid = "esw-m19@iiith"; // Enter iiith SSID here
+//const char *pwd = "e5W-eMai@3!20hOct";  //Enter Password here
 
 WebServer server(80);
 //void startCameraServer();
@@ -74,7 +74,7 @@ WebServer server(80);
 //************** OM2M *****************
 #define CSE_IP     "esw-onem2m.iiit.ac.in" //"esw-onem2m.iiit.ac.in"//nand-"192.168.171.221"//"127.0.0.1"////ruch -"192.168.36.221" //replace with system-ip  // //esw-onem2m.iiit.ac.in
 #define CSE_PORT  443 //5089 //443
-#define HTTPS     false
+#define HTTPS     true
 #define OM2M_ORGIN   "zZ!#4s:m&Y#HL"//"zZ!#4s:m&Y#HL" //"admin:admin"
 #define OM2M_MN     "/~/in-cse/in-name/"
 #define OM2M_AE     "Team-28"//"Team-28"//"Od-TEST"//"OD-TEST" //"AE-TEST"
@@ -240,14 +240,16 @@ void om2m_createCI(int & pirState, String & row01,String & row23,String & row45,
   //******* time n date ******
  // String data="[" + String(epochTime)+","+ String(pirState) + ",[["+ row01 +"],[" +row23 +"],["+ row45 +"],["+ row67 +"]]]"; //String(occupancy) + " , " + String(distance)
   String data="[" + String(timeStamp)+","+ String(pirState) + ",[["+ row01 +"],[" +row23 +"],["+ row45 +"],["+ row67 +"]]]"; //String(occupancy) + " , " + String(distance)
-  String httpserver="http://" + String() + CSE_IP + ":" + String() + CSE_PORT + String()+OM2M_MN;
+  //String httpserver="http://" + String() + CSE_IP + ":" + String() + CSE_PORT + String()+OM2M_MN;
+  //String httpserver="https://" + String() + CSE_IP + ":" + String() /*+ CSE_PORT + String()*/+OM2M_MN;
   
   Serial.println(data);
-  http.begin(httpserver + String() +OM2M_AE + "/" + OM2M_DATA_CONT + "/");
-  
+  //http.begin(httpserver + String() +OM2M_AE + "/" + OM2M_DATA_CONT + "/");
+  http.begin("https://esw-onem2m.iiit.ac.in/~/in-cse/in-name/Team-28/Node-1/Data/");
+  Serial.println("https://esw-onem2m.iiit.ac.in/~/in-cse/in-name/Team-28/Node-1/Data/");
   http.addHeader("X-M2M-Origin", OM2M_ORGIN);
   http.addHeader("Content-Type", "application/json;ty=4");
-  http.addHeader("Content-Length", "600");
+  //http.addHeader("Content-Length", "600");
   
   
   
@@ -266,9 +268,14 @@ void om2m_createCI(int & pirState, String & row01,String & row23,String & row45,
   
     + "}}";
   int code = http.POST(req_data);
+  
   Serial.println(code);
-  if (code == -1) {
-  Serial.println("UNABLE TO CONNECT TO THE SERVER");
+  if(code == 201 ){
+    Serial.print("cin_"+String(i-1));
+    Serial.println("  CREATED");
+  }
+  else if (code == -1) {
+    Serial.println("UNABLE TO CONNECT TO THE SERVER");
   }
   http.end();
 }
@@ -341,7 +348,7 @@ void loop(){
   
   //***************GRID EYE CODE
  
- //we are sending data to thingspeak & OM2M every 30 seconds 
+ //we are sending data to thingspeak & OM2M every 60 seconds 
  if(count == 30){ 
   
     String row01 = String(arr[0]+","+arr[1]);
