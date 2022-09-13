@@ -386,34 +386,34 @@ void loop(){
     Serial.println();
   }
   
-//    String row01 = String(arr[0]+","+arr[1]);
-//    String row23 = String(arr[2]+","+arr[3]);
-//    String row45 = String(arr[4]+","+arr[5]);
-//    String row67 = String(arr[6]+","+arr[7]);
+    String row01 = String(arr[0]+","+arr[1]);
+    String row23 = String(arr[2]+","+arr[3]);
+    String row45 = String(arr[4]+","+arr[5]);
+    String row67 = String(arr[6]+","+arr[7]);
 
     
 //     //************** OM2M *****************
 //     om2m_createCI(pirState,row01,row23,row45,row67);
 //
 //    //************** OM2M *****************
-//    //********** Thingspeak **********
-//     ThingSpeak.setField(1, pirState);
-//     ThingSpeak.setField(2, gridEyeTemperature);
-//     ThingSpeak.setField(3, row01);
-//     ThingSpeak.setField(4, row23);
-//     ThingSpeak.setField(5, row45);
-//     ThingSpeak.setField(6, row67);
-//
-// 
-//     int x = ThingSpeak.writeFields(myChannelNumber, WriteAPI);
-//
-//     if(x == 200){
-//       Serial.println("Channel update successful.");
-//     }
-//     else{
-//       Serial.println("Problem updating channel. HTTP error code " + String(x));
-//     }
-//     //********** Thingspeak **********
+    //********** Thingspeak **********
+     ThingSpeak.setField(1, pirState);
+     ThingSpeak.setField(2, gridEyeTemperature);
+     ThingSpeak.setField(3, row01);
+     ThingSpeak.setField(4, row23);
+     ThingSpeak.setField(5, row45);
+     ThingSpeak.setField(6, row67);
+
+ 
+     int x = ThingSpeak.writeFields(myChannelNumber, WriteAPI);
+
+     if(x == 200){
+       Serial.println("Channel update successful.");
+     }
+     else{
+       Serial.println("Problem updating channel. HTTP error code " + String(x));
+     }
+     //********** Thingspeak **********
      count = 0;
  }
    delay(1000);
