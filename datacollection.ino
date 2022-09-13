@@ -350,35 +350,70 @@ void loop(){
  
  //we are sending data to thingspeak & OM2M every 60 seconds 
  if(count == 30){ 
-  
-    String row01 = String(arr[0]+","+arr[1]);
-    String row23 = String(arr[2]+","+arr[3]);
-    String row45 = String(arr[4]+","+arr[5]);
-    String row67 = String(arr[6]+","+arr[7]);
-
-    
-     //************** OM2M *****************
-     om2m_createCI(pirState,row01,row23,row45,row67);
-
-    //************** OM2M *****************
-    //********** Thingspeak **********
-     ThingSpeak.setField(1, pirState);
-     ThingSpeak.setField(2, gridEyeTemperature);
-     ThingSpeak.setField(3, row01);
-     ThingSpeak.setField(4, row23);
-     ThingSpeak.setField(5, row45);
-     ThingSpeak.setField(6, row67);
+  //******* time n date ******
+    while(!timeClient.update()) {
+      timeClient.forceUpdate();
+    }
+    // The formattedDate comes with the following format:
+  // 2018-05-28T16:00:13Z
+  // We need to extract date and time
+  formattedDate = timeClient.getFormattedDate();
+//  Serial.println(formattedDate);
 
  
-     int x = ThingSpeak.writeFields(myChannelNumber, WriteAPI);
+  // Extract date
+  int splitT = formattedDate.indexOf("T");
+  dayStamp = formattedDate.substring(0, splitT);
+//  Serial.print("DATE: ");
+//  Serial.println(dayStamp);
+  // Extract time
+  timeStamp = formattedDate.substring(splitT+1, formattedDate.length()-1);
+  Serial.print("HOUR: ");
+  Serial.println(timeStamp);
+    
+  //******* time n date ******
+  Serial.print("pir state: ");
+  Serial.println(pirState);
+  Serial.println("Temperature Matrix: ");
+  String arr[8]={""};
+  for (int x = 0; x < 8; x++){
+    for (int y = 0; y < 8; y++){
+      Serial.print(grid_sensor.pixelMatrix[y][x]);
+      arr[x] = String(arr[x]+ String(grid_sensor.pixelMatrix[y][x]));
+      if(y<7)arr[x]= String(arr[x]+",");
+      Serial.print(" ");
+    }
+    Serial.println();
+  }
+  
+//    String row01 = String(arr[0]+","+arr[1]);
+//    String row23 = String(arr[2]+","+arr[3]);
+//    String row45 = String(arr[4]+","+arr[5]);
+//    String row67 = String(arr[6]+","+arr[7]);
 
-     if(x == 200){
-       Serial.println("Channel update successful.");
-     }
-     else{
-       Serial.println("Problem updating channel. HTTP error code " + String(x));
-     }
-     //********** Thingspeak **********
+    
+//     //************** OM2M *****************
+//     om2m_createCI(pirState,row01,row23,row45,row67);
+//
+//    //************** OM2M *****************
+//    //********** Thingspeak **********
+//     ThingSpeak.setField(1, pirState);
+//     ThingSpeak.setField(2, gridEyeTemperature);
+//     ThingSpeak.setField(3, row01);
+//     ThingSpeak.setField(4, row23);
+//     ThingSpeak.setField(5, row45);
+//     ThingSpeak.setField(6, row67);
+//
+// 
+//     int x = ThingSpeak.writeFields(myChannelNumber, WriteAPI);
+//
+//     if(x == 200){
+//       Serial.println("Channel update successful.");
+//     }
+//     else{
+//       Serial.println("Problem updating channel. HTTP error code " + String(x));
+//     }
+//     //********** Thingspeak **********
      count = 0;
  }
    delay(1000);
