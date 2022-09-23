@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+# import seaborn as sns
+# import matplotlib.pyplot as plt
 import pickle
 from joblib import Parallel, delayed
 import joblib
-#from model import RF,doit,find_blob_sizes
+
 
 pir_status = 1 # or 0 which we get from thingspeak
 pixel_matrix_list = [[26.75 ,26.75, 25.50,  25.50,  25.50,  25.25, 25.00,   24.25],
@@ -60,10 +60,10 @@ def find_blob_sizes(arr):
 cells = np.array(pixel_matrix_list) # this is 8x8 numpy array
 #print(cells)
 
-## heat map  plot
-heat_map = cells
-ax = sns.heatmap(heat_map, linewidth=0.5, cmap = 'YlOrBr')
-plt.show()
+# ## heat map  plot
+# heat_map = cells
+# ax = sns.heatmap(heat_map, linewidth=0.5, cmap = 'YlOrBr')
+# plt.show()
 
 avg_temp=np.average(cells)
 standard_deviation = np.std(cells) # calculate sd of the pixel matrix
@@ -76,10 +76,10 @@ for a in range(8):
             count_actv_cells+=1
         else: cells[a][r] = 0
 
-# pixelated image plot
-pixelated_image = cells
-plt.imshow( pixelated_image , cmap = 'hot' , interpolation = 'nearest' ) 
-plt.show()
+# # pixelated image plot
+# pixelated_image = cells
+# plt.imshow( pixelated_image , cmap = 'hot' , interpolation = 'nearest' ) 
+# plt.show()
 
 ans = find_blob_sizes(cells)   #This modifies cells and all values will be zero.
 ans.sort(reverse = True)
@@ -109,19 +109,11 @@ mydataset = {
 input = pd.DataFrame(mydataset)
 
 # print(input) # prints input data frame of single tuple
-#output = RF.predict(input) # return numpy array
-# # Load the pickled model
-# esw_rf = pickle.loads(esw_model)
-# # Use the loaded pickled model to make predictions
-# output = esw_rf.predict(input)
 
-# Load the model from the file
+
+# Load the model from the pkl file
 esw_model = joblib.load('p_model.pkl')
   
 # Use the loaded model to make predictions
-output = esw_model.predict(input)
+output = esw_model.predict(input) # return numpy array
 print("predicted no.of people = ",output[0])
-
-
-
-
