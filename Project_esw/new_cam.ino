@@ -1,4 +1,5 @@
 #include <ThingSpeak.h>
+//#include <esp32cam.h>
 #include <WiFi.h>
 #include <WebServer.h>
 #include <WiFiClient.h>
@@ -8,9 +9,23 @@
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 #include "Base64.h"
-#include <Melopero_AMG8833.h>
 
+#include <Melopero_AMG8833.h>
 Melopero_AMG8833 grid_sensor;
+
+//*** time n date**********
+
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+// Define NTP Client to get time
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
+// Variables to save date and time
+String formattedDate;
+String dayStamp;
+String timeStamp;
+
+//***** time n date
 
 //*******CAM codef
 #include "esp_camera.h"
@@ -28,7 +43,6 @@ const char* host = "api.thingspeak.com";
 const char* WriteAPI = "T27SXD639SVCB0MX";
 
 WiFiClient  client;
-
 unsigned long myChannelNumber = 2;
 
 // SCL_pin is GPIO22 in esp32
@@ -44,10 +58,15 @@ long lastTrigger = 0;
 boolean startTimer = false;
 int val = LOW;
 int count=0;
+//unsigned long epochTime; 
 
 /*Put your SSID & Password*/
+//const char *ssid = "Galaxy M112694"; // Enter SSID here
+//const char *pwd = "12345678";  //Enter Password here
 const char *ssid = "Galaxy M511CCF"; // Enter SSID here
 const char *pwd = "ramreddy@3";  //Enter Password here
+//const char *ssid = "esw-m19@iiith"; // Enter SSID here
+//const char *pwd = "e5W-eMai@3!20hOct";  //Enter Password here
 
 // https://script.google.com/macros/s/AKfycbxUyS-RZ-7dKZ9NswutjR8q9kdm1xOP9nMO6eGxNntD4jjzup1Z1rjpYMR0WNUPTrSi/exec
 String myScript = "/macros/s/AKfycbxUyS-RZ-7dKZ9NswutjR8q9kdm1xOP9nMO6eGxNntD4jjzup1Z1rjpYMR0WNUPTrSi/exec";    //Create your Google Apps Script and replace the "myScript" path.
@@ -78,50 +97,61 @@ String myImage = "&myFile=";
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
+WebServer server(80);
+//************** OM2M *****************
+//#define CSE_IP     "192.168.36.221"// "127.0.0.1"//"esw-onem2m.iiit.ac.in"//"192.168.171.221"//////192.168.36.221 //replace with system-ip  // //esw-onem2m.iiit.ac.in
+//#define CSE_PORT   5089// 443 //5089 //443
+//#define HTTPS     false
+//#define OM2M_ORGIN   "admin:admin"//"zZ!#4s:m&Y#HL" //"admin:admin"// //"zZ!#4s:m&Y#HL" 
+//#define OM2M_MN     "/~/in-cse/in-name/"
+//#define OM2M_AE     "Od-TEST"//"Team-28"//"Od-TEST"//// //"AE-TEST" //"Team-28"
+//#define OM2M_DATA_CONT  "Node-1/Data"
+
+
+//************** OM2M *****************
 
 void setup()
 {
-  //WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
   
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println();
   delay(100);
-  pinMode(pirPin, INPUT);
-  pinMode(motionLed, OUTPUT);
-  digitalWrite(motionLed, ledState);
+//  pinMode(pirPin, INPUT);
+//  pinMode(motionLed, OUTPUT);
+//  digitalWrite(motionLed, ledState);
   
- //********** GRID EYE CODE
-  // initializing I2C to use default address AMG8833_I2C_ADDRESS_B and Wire (I2C-0):
-  Wire.begin();
-  grid_sensor.initI2C();
-  // To use Wire1 (I2C-1):
-  //Wire1.begin();
-//  sensor.initI2C(AMG8833_I2C_ADDRESS_B, Wire1);
-  Serial.println("Resetting grid_sensor ... ");  
-  int statusCode = grid_sensor.resetFlagsAndSettings();
-  Serial.println(grid_sensor.getErrorDescription(statusCode));
-
-  Serial.println("Setting FPS ... ");
-  statusCode = grid_sensor.setFPSMode(FPS_MODE::FPS_10);
-  Serial.println(grid_sensor.getErrorDescription(statusCode));
-//******** GRID EYE CODE
+// //********** GRID EYE CODE
+//  // initializing I2C to use default address AMG8833_I2C_ADDRESS_B and Wire (I2C-0):
+//  Wire.begin();
+//  grid_sensor.initI2C();
+//  // To use Wire1 (I2C-1):
+//  //Wire1.begin();
+////  sensor.initI2C(AMG8833_I2C_ADDRESS_B, Wire1);
+//  Serial.println("Resetting grid_sensor ... ");  
+//  int statusCode = grid_sensor.resetFlagsAndSettings();
+//  Serial.println(grid_sensor.getErrorDescription(statusCode));
+//
+//  Serial.println("Setting FPS ... ");
+//  statusCode = grid_sensor.setFPSMode(FPS_MODE::FPS_10);
+//  Serial.println(grid_sensor.getErrorDescription(statusCode));
+////******** GRID EYE CODE
   
-  // Serial.println("--------------- Welcome -----------------");
+  Serial.println("--------------- Welcome -----------------");
   Serial.println("Connecting to ");
   Serial.println(ssid);
   Serial.println();
+
   WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pwd);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    //ESP.restart();
+//    Serial.println("WiFi Connected!!");
   }
   Serial.print("http://");
   Serial.println(WiFi.localIP());
- 
-//  server.begin();
+  
 camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
   config.ledc_timer = LEDC_TIMER_0;
@@ -166,126 +196,113 @@ camera_config_t config;
   sensor_t * s = esp_camera_sensor_get();
   s->set_framesize(s, FRAMESIZE_VGA);  // UXGA|SXGA|XGA|SVGA|VGA|CIF|QVGA|HQVGA|QQVGA
   }
+  server.begin();
   Serial.println("HTTP server started");
-  ThingSpeak.begin(client); 
+//   ThingSpeak.begin(client); 
+//******* time n date ******
+  // Initialize a NTPClient to get time
+  timeClient.begin();
+  timeClient.setTimeOffset(19800);
 }
 
-void loop()
-{
-   //server.handleClient();
+
+
+void loop(){
   
-  val = digitalRead(pirPin);  // read pir value
-  if (val == HIGH){
-    
-    digitalWrite(motionLed, HIGH);
-    ledState = HIGH;
-    startTimer = true;
-    lastTrigger = millis();
-    if(pirState == LOW){
-      Serial.println("MOTION DETECTED!!!");
-      pirState = HIGH;
-    }
-  }
-  else if(val ==LOW){
-      if(pirState == HIGH){
-        Serial.println("Motion stopped...");
-        pirState = LOW;
-      }
-  }
-  now = millis();
-  if(startTimer && ((now - lastTrigger) > (timeSeconds*1000))) {
-   // Serial.println("Motion stopped...");
-   
-    digitalWrite(motionLed, LOW);
-    ledState=LOW;
-    //Serial.println(ledState);
-    
-    //pirState=LOW;
-    startTimer = false;
-  }
+   server.handleClient();
+  
+//   val = digitalRead(pirPin);  // read pir value
+//  if (val == HIGH){
+//    
+//    digitalWrite(motionLed, HIGH);
+//    ledState = HIGH;
+//    startTimer = true;
+//    lastTrigger = millis();
+//    if(pirState == LOW){
+//      pirState = HIGH;
+//    }
+//  }
+//  else if(val ==LOW){
+//      if(pirState == HIGH){
+//        pirState = LOW;
+//      }
+//  }
+//
+//  now = millis();
+//  if(startTimer && ((now - lastTrigger) > (timeSeconds*1000))) {
+//   
+//    digitalWrite(motionLed, LOW);
+//    ledState=LOW;
+//    
+//    //pirState=LOW;
+//    startTimer = false;
+//  }
 // if duration after "motion stopped"  and next line is >=10 sec . then it is considered as motion stopped really, otherwise motion is not really stopped.
   
   
   
-  //***************GRID EYE CODE
-  Serial.print("Updating grid_eye thermistor temperature ... ");
-  int statusCode = grid_sensor.updateThermistorTemperature();
-  Serial.println(grid_sensor.getErrorDescription(statusCode));
+//  //***************GRID EYE CODE
+//  //Serial.print("Updating grid_eye thermistor temperature ... ");
+//  int statusCode = grid_sensor.updateThermistorTemperature();
+//  //Serial.println(grid_sensor.getErrorDescription(statusCode));
+//
+//  //Serial.print("Updating pixel matrix ... ");
+//  statusCode = grid_sensor.updatePixelMatrix();
+//  //Serial.println(grid_sensor.getErrorDescription(statusCode));
+//
+//  //Serial.print("Thermistor temp: ");
+//  int gridEyeTemperature = grid_sensor.thermistorTemperature;
+//
+//    String arr[8]={""};
+//  for (int x = 0; x < 8; x++){
+//    for (int y = 0; y < 8; y++){
+//      //Serial.print(grid_sensor.pixelMatrix[y][x]);
+//      arr[x] = String(arr[x]+ String(grid_sensor.pixelMatrix[y][x]));
+//      if(y<7)arr[x]= String(arr[x]+",");
+//      //Serial.print(" ");
+//    }
+//    Serial.println();
+//  }
+ //we are sending data to thingspeak & OM2M every 30 seconds 
+ if(count == 30){ 
 
-  Serial.print("Updating pixel matrix ... ");
-  statusCode = grid_sensor.updatePixelMatrix();
-  Serial.println(grid_sensor.getErrorDescription(statusCode));
-
-  Serial.print("Thermistor temp: ");
-  int gridEyeTemperature = grid_sensor.thermistorTemperature;
-  Serial.print(gridEyeTemperature);
-  Serial.println("°C");
-  
-  Serial.println("Temperature Matrix: ");
-  String arr[8]={""};
-  for (int x = 0; x < 8; x++){
-    for (int y = 0; y < 8; y++){
-      Serial.print(grid_sensor.pixelMatrix[y][x]);
-      arr[x] = String(arr[x]+ String(grid_sensor.pixelMatrix[y][x]));
-      if(y<7)arr[x]= String(arr[x]+",");
-      Serial.print(" ");
-    }
-    Serial.println();
-  }
-
-  
-  //***************GRID EYE CODE
-
-   //***************Thingspeak
-
- //we are sending data to thingspeak every 15 seconds 
-if(count == 15){ 
-     
-    ThingSpeak.setField(1, pirState);
-    ThingSpeak.setField(2, gridEyeTemperature);
-  
-    String row01 = String(arr[0]+","+arr[1]);
-    String row23 = String(arr[2]+","+arr[3]);
-    String row45 = String(arr[4]+","+arr[5]);
-    String row67 = String(arr[6]+","+arr[7]);
-  
-    ThingSpeak.setField(3, row01);
-    ThingSpeak.setField(4, row23);
-    ThingSpeak.setField(5, row45);
-    ThingSpeak.setField(6, row67);
-  
-    Serial.println();
-    Serial.println("Pixel matrix rows converted to strings by values being separated by commas");
-    Serial.println();
-    Serial.print("row 0 & 1: ");
-    Serial.println(row01);
-    Serial.print("row 2 & 3: ");
-    Serial.println(row23);
-    Serial.print("row 4 & 5: ");
-    Serial.println(row45);
-    Serial.print("row 6 & 7: ");
-    Serial.println(row67);
-    Serial.println();
-    // Write to ThingSpeak. There are up to 8 fields in a channel, allowing you to store up to 8 different
-    // pieces of information in a channel. 
     
-    int x = ThingSpeak.writeFields(myChannelNumber, WriteAPI);
+//    String row01 = String(arr[0]+","+arr[1]);
+//    String row23 = String(arr[2]+","+arr[3]);
+//    String row45 = String(arr[4]+","+arr[5]);
+//    String row67 = String(arr[6]+","+arr[7]);
 
-    if(x == 200){
-      Serial.println("Channel update successful.");
-    }
-    else{
-      Serial.println("Problem updating channel. HTTP error code " + String(x));
-    }
-    count = 0;
-}
+    
+//     //************** OM2M *****************
+     //om2m_createCI(pirState,row01,row23,row45,row67);
+    //************** OM2M *****************
+    
+    //********** Thingspeak **********
 
-   SendCapturedImage();
+     SendCapturedImage();
+//     ThingSpeak.setField(1, pirState);
+//     ThingSpeak.setField(2, gridEyeTemperature);
+//     ThingSpeak.setField(3, row01);
+//     ThingSpeak.setField(4, row23);
+//     ThingSpeak.setField(5, row45);
+//     ThingSpeak.setField(6, row67);
+//
+//     
+//     int x = ThingSpeak.writeFields(myChannelNumber, WriteAPI);
+//
+//     if(x == 200){
+//       Serial.println("Channel update successful.");
+//     }
+//     else{
+//       Serial.println("Problem updating channel. HTTP error code " + String(x));
+//     }
+//     //********** Thingspeak **********
+     count = 0;
+ }
    delay(1000);
    count++;
 }
 
- 
 String SendCapturedImage() {
   const char* myDomain = "script.google.com";
   String getAll="", getBody = "";
@@ -294,7 +311,7 @@ String SendCapturedImage() {
   fb = esp_camera_fb_get();  
   if(!fb) {
     Serial.println("Camera capture failed");
-    delay(1000);
+    //delay(1000);
     ESP.restart();
     return "Camera capture failed";
   }  
@@ -397,3 +414,4 @@ String urlencode(String str)
     }
     return encodedString;
 }
+ 
