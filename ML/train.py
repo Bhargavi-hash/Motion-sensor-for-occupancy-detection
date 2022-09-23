@@ -183,20 +183,6 @@ print("accuracy score : ",accuracy_score(y_test, y_pred))
 # print(RF.feature_importances_)
 
 
-# # Save the trained model as a pickle string.
-# esw_model = pickle.dumps(RF)
-# # print(esw_model)
-# # # Load the pickled model
-# # esw_rf = pickle.loads(esw_model)
-  
-# # # Use the loaded pickled model to make predictions
-# # esw_rf.predict(X_test)
-
 # Save the model as a pickle in a file
 joblib.dump(RF, 'p_model.pkl')
   
-# # Load the model from the file
-# knn_from_joblib = joblib.load('filename.pkl')
-  
-# # Use the loaded model to make predictions
-# knn_from_joblib.predict(X_test)
