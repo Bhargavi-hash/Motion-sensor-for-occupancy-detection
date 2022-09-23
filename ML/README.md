@@ -1,6 +1,15 @@
+## Libraries needed
+> pandas<br>
+> numpy<br>
+> seaborn<br>
+> matplotlib<br>
+> pickle<br>
+> joblib<br>
+
+
 ## steps to perform prediction on the given input
 1) download the files into a folder.
-2) run predict.py/prediction.ipynb by giving pixel_matrix_list and corresponding pir_status as input to get the predicted number of people as output.
+2) run predict.py/prediction.ipynb by giving pixel_matrix_list and corresponding pir_status as the input to get the predicted number of people as output.
 
 ## Integration into Application
 > 1) download ( prediction.ipynb and j_model.pkl ) or (predict.py and p_model.pkl) whichever u prefer into the same folder.
