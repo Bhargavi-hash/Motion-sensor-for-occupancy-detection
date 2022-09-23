@@ -35,5 +35,5 @@
 > - Random forest classifier has shown better accuracy when compared with KNN. Therefore, the former one is selected for our project.
 
 ## other details
-> - models are stored in j_model.pkl and p_model.pkl which are obtained by running training.ipynb and train.ipynb respectively.
+> - models are stored in j_model.pkl and p_model.pkl which are obtained by running training.ipynb and train.py respectively.
 
