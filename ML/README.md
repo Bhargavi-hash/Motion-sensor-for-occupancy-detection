@@ -1,8 +1,8 @@
 ## Libraries needed
 > pandas<br>
 > numpy<br>
-> seaborn<br>
-> matplotlib<br>
+> seaborn (optional) <br>
+> matplotlib (optional) <br>
 > pickle<br>
 > joblib<br>
 
