@@ -6,6 +6,7 @@
 > 1) download ( prediction.ipynb and j_model.pkl ) or (predict.py and p_model.pkl) whichever u prefer into the same folder.
 > 2) give the latest  pixel_matrix as list of lists and corresponding pir status as input in the prediction file.
 > 3) get the no.of people as output from the prediction file.
+> 4) we get heatmap and corresponding pixelated image also for the given pixel matrix.
 
 
 ## other details
