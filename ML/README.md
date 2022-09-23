@@ -3,9 +3,9 @@
 2) run predict.py/prediction.ipynb by giving pixel_matrix_list and corresponding pir_status as input to get the predicted number of people as output.
 
 ## Integration into Application
-> download ( prediction.ipynb and j_model.pkl ) or (predict.py and p_model.pkl) whichever u prefer into the same folder.
-> give the latest  pixel_matrix as list of lists and corresponding pir status as input in the prediction file.
-> get the no.of people as output from the prediction file.
+> 1) download ( prediction.ipynb and j_model.pkl ) or (predict.py and p_model.pkl) whichever u prefer into the same folder.
+> 2) give the latest  pixel_matrix as list of lists and corresponding pir status as input in the prediction file.
+> 3) get the no.of people as output from the prediction file.
 
 
 ## other details
