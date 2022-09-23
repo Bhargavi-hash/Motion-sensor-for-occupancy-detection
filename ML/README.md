@@ -6,7 +6,7 @@
 > pickle<br>
 > joblib<br>
 
-## steps to perform prediction on the given input
+## How to perform prediction on the given input
 1) download the files into a folder.
 2) run predict.py/prediction.ipynb by giving pixel_matrix_list and corresponding pir_status as the input to get the predicted number of people as output.
 
@@ -26,12 +26,14 @@
 > - Finally, the training data consists of 8 attributes out of which pir_state, mean, standard deviation, no.of active cells, first_blob, second_blob, third_blob are independent variables while count is the dependent variable.<br>
 
 ## About Model
-> - Random classifier neural network is used to train and create the model.<br>
+> - Random forest classifier neural network is used to train and create the model.<br>
 > - Train and Test data are split in the ratio 2:1 from the dataset which has 1200+ data points.<br>
-> - The ML algorithm is trained with the Train data and the model obtained is saved in a .pkl file.<br>
-> 
-> 
+> - The ML algorithm is trained with the Train data and the model obtained is tested with the Test data.<br>
+> - Accuracy obtained is ~ 85% . <br> 
+> - The model is saved in a .pkl file.<br>
+> - whenever we want to use the model for prediction, The corresponding .pkl file is loaded and the returned model is used.<br>
+> - Random forest classifier has shown better accuracy when compared with KNN. Therefore, the former one is selected for our project.
 
 ## other details
-> models are stored in j_model.pkl and p_model.pkl which are obtained by running training.ipynb and train.ipynb respectively.
+> - models are stored in j_model.pkl and p_model.pkl which are obtained by running training.ipynb and train.ipynb respectively.
 
