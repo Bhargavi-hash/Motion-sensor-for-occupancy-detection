@@ -52,8 +52,7 @@ int count=0;
 
 
 /*Put your SSID & Password*/
-//const char *ssid = "Galaxy M112694"; // Enter SSID here
-//const char *pwd = "12345678";  //Enter Password here
+
 const char *ssid = "Galaxy M511CCF"; // Enter SSID here
 const char *pwd = "ramreddy@3";  //Enter Password here
 //const char *ssid = "esw-m19@iiith"; // Enter iiith SSID here
