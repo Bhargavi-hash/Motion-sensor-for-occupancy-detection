@@ -1,26 +1,28 @@
 import streamlit as st
 from onem2m import *
-# from retrieve import *
 from pymongo import MongoClient
-
 import time
-
 import urllib.request as urllib2
 import json
 import streamlit.components.v1 as components
 import bcrypt
 import plotly.express as px
+# from retrieve import *
 # from predict import *
-
+import requests
+import json
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pickle
+from joblib import Parallel, delayed
+import joblib
 
 READ_API_KEY='G32R85RJUZL7CWY4'   
 CHANNEL_ID= '1848200'
 
 st.set_page_config(layout="wide")
-
-import requests
-import json
-
 
 # ================================ Motion retrieval ==========================================
 def om2m_motion_retrieval():
@@ -43,13 +45,7 @@ def om2m_motion_retrieval():
     return res1
 
 ##=================== predict.py ============================
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import pickle
-from joblib import Parallel, delayed
-import joblib
+
 
 def doit(arr, count, visited, i, j):
         if(i < 0 or i > 7 or j < 0 or j > 7):return count 
