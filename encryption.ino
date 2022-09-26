@@ -236,7 +236,7 @@ void loop(){
   }
   else if(val ==LOW){
       if(pirState == HIGH){
-        Serial.println("Motion stopped...");
+//         Serial.println("Motion stopped...");
         pirState = LOW;
       }
   }
