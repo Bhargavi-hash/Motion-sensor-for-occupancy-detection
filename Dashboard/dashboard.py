@@ -1,5 +1,5 @@
 import streamlit as st
-from onem2m import *
+# from onem2m import *
 from pymongo import MongoClient
 import time
 import urllib.request as urllib2
@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import pickle
+# import pickle
 from joblib import Parallel, delayed
 import joblib
 
@@ -434,7 +434,6 @@ def main():
                     st.header("Fields to be displayed here")
                     st.markdown(
                 """
-
                  - Temperature
                  - Heat map
                  - Occupancy statistics
@@ -480,4 +479,3 @@ if __name__ == "__main__":
 
     DEBUG = os.environ.get("DEBUG", "false").lower() not in ["false", "no", "0"]
     main()
-    
