@@ -2,18 +2,9 @@ import streamlit as st
 from onem2m import *
 # from retrieve import *
 from pymongo import MongoClient
-# import numpy as np
-# from sklearn.ensemble import RandomForestClassifier
-# from sklearn.model_selection import train_test_split
-# import statistics
-# import seaborn as sns
-import time
-# import matplotlib.pyplot as pltTS = urllib2.urlopen("http://api.thingspeak.com/channels/%s/feeds/last.json?api_key=%s" \
-    #                    % (CHANNEL_ID,READ_API_KEY))
 
-    # response = TS.read()
-    # data = json.loads(response)
-# from functions import *
+import time
+
 import urllib.request as urllib2
 import json
 import streamlit.components.v1 as components
@@ -29,7 +20,7 @@ st.set_page_config(layout="wide")
 
 import requests
 import json
-# import matplotlib.pyplot as plt
+
 
 # ================================ Motion retrieval ==========================================
 def om2m_motion_retrieval():
@@ -255,113 +246,10 @@ def return_matrix ( row1_2,  row3_4,row5_6, row7_8):
     return map
 
 
-# latestTime = ""
+
 
 def Thingspeak_HeatMap(matrix):
-    # TS = urllib2.urlopen("http://api.thingspeak.com/channels/%s/feeds/last.json?api_key=%s" \
-    #                    % (CHANNEL_ID,READ_API_KEY))
-
-    # response = TS.read()
-    # data = json.loads(response)
-
-    # RecentMapTime = data['created_at']
-    # # latestTime = RecentMapTime
-    # st.write(RecentMapTime)
-    
-    # pir = data['field1']
-
-    # row1_2 = data['field3']
-    # fragment1 = row1_2.split(',')
-    
-    # row3_4 = data['field4']
-    # fragment2 = row3_4.split(',')
-
-    # row5_6 = data['field5']
-    # fragment3 = row5_6.split(',')
-
-    # row7_8 = data['field6']
-    # fragment4 = row7_8.split(',')
-
-    # r1c1 = float(fragment1[0])
-    # r1c2 = float(fragment1[1])
-    # r1c3 = float(fragment1[2])
-    # r1c4 = float(fragment1[3])
-    # r1c5 = float(fragment1[4])
-    # r1c6 = float(fragment1[5])
-    # r1c7 = float(fragment1[6])
-    # r1c8 = float(fragment1[7])
-
-    # r2c1 = float(fragment1[8])
-    # r2c2 = float(fragment1[9])
-    # r2c3 = float(fragment1[10])
-    # r2c4 = float(fragment1[11])
-    # r2c5 = float(fragment1[12])
-    # r2c6 = float(fragment1[13])
-    # r2c7 = float(fragment1[14])
-    # r2c8 = float(fragment1[15])
-
-    # r3c1 = float(fragment2[0])
-    # r3c2 = float(fragment2[1])
-    # r3c3 = float(fragment2[2])
-    # r3c4 = float(fragment2[3])
-    # r3c5 = float(fragment2[4])
-    # r3c6 = float(fragment2[5])
-    # r3c7 = float(fragment2[6])
-    # r3c8 = float(fragment2[7])
-
-    # r4c1 = float(fragment2[8])
-    # r4c2 = float(fragment2[9])
-    # r4c3 = float(fragment2[10])
-    # r4c4 = float(fragment2[11])
-    # r4c5 = float(fragment2[12])
-    # r4c6 = float(fragment2[13])
-    # r4c7 = float(fragment2[14])
-    # r4c8 = float(fragment2[15])
-
-    # r5c1 = float(fragment3[0])
-    # r5c2 = float(fragment3[1])
-    # r5c3 = float(fragment3[2])
-    # r5c4 = float(fragment3[3])
-    # r5c5 = float(fragment3[4])
-    # r5c6 = float(fragment3[5])
-    # r5c7 = float(fragment3[6])
-    # r5c8 = float(fragment3[7])
-
-    # r6c1 = float(fragment3[8])
-    # r6c2 = float(fragment3[9])
-    # r6c3 = float(fragment3[10])
-    # r6c4 = float(fragment3[11])
-    # r6c5 = float(fragment3[12])
-    # r6c6 = float(fragment3[13])
-    # r6c7 = float(fragment3[14])
-    # r6c8 = float(fragment3[15])
-
-    # r7c1 = float(fragment4[0])
-    # r7c2 = float(fragment4[1])
-    # r7c3 = float(fragment4[2])
-    # r7c4 = float(fragment4[3])
-    # r7c5 = float(fragment4[4])
-    # r7c6 = float(fragment4[5])
-    # r7c7 = float(fragment4[6])
-    # r7c8 = float(fragment4[7])
-
-    # r8c1 = float(fragment4[8])
-    # r8c2 = float(fragment4[9])
-    # r8c3 = float(fragment4[10])
-    # r8c4 = float(fragment4[11])
-    # r8c5 = float(fragment4[12])
-    # r8c6 = float(fragment4[13])
-    # r8c7 = float(fragment4[14])
-    # r8c8 = float(fragment4[15])
-
-    # map = [[r1c1, r1c2, r1c3, r1c4, r1c5, r1c6, r1c7, r1c8],
-    #        [r2c1, r2c2, r2c3, r2c4, r2c5, r2c6, r2c7, r2c8],
-    #        [r3c1, r3c2, r3c3, r3c4, r3c5, r3c6, r3c7, r3c8],
-    #        [r4c1, r4c2, r4c3, r4c4, r4c5, r4c6, r4c7, r4c8],
-    #        [r5c1, r5c2, r5c3, r5c4, r5c5, r5c6, r5c7, r5c8],
-    #        [r6c1, r6c2, r6c3, r6c4, r6c5, r6c6, r6c7, r6c8],
-    #        [r7c1, r7c2, r7c3, r7c4, r7c5, r7c6, r7c7, r7c8],
-    #        [r8c1, r8c2, r8c3, r8c4, r8c5, r8c6, r8c7, r8c8]]
+  
 
     map = matrix
     heatmap = px.imshow(map, text_auto= False, aspect="auto")
@@ -405,19 +293,6 @@ def Thingspeak_HeatMap(matrix):
 
 connection_url='mongodb+srv://bhargavi:esw2022@eswpro.pkqjhmv.mongodb.net/?retryWrites=true&w=majority'
 DB_NAME = 'userDetails'
-
-# ans = []
-
-# a = []
-
-# output = []
-# avg = []
-# sd = []
-# nfa = []
-
-
-# vis = []
-# cnt = 1
 
 
 
