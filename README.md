@@ -18,3 +18,5 @@ Embedded systems workshop team project for Motion sensor for occupancy detection
 ## Connection to iiith network for esp32
 -const char *ssid = "esw-m19@iiith"; // Enter SSID here
 -const char *pwd = "e5W-eMai@3!20hOct";  //Enter Password here
+## Link to view the app
+https://bhargavi-hash-occupancy-detection-dashboard-dashboard-7yfya8.streamlitapp.com/
